@@ -388,21 +388,15 @@ end
 end
 
 traces =[S2_do_inference(speaker2, 0, 0.35, Dict("soc"=> 0.30, "pres"=> 0.45, "inf"=> 0.25), 100) for _=1:10000]
-
 trace_pl = [trace[:utterance] for trace in traces]
-
 counts = countmap(trace_pl)
-
 proportions = Dict(utt => count / 10000 for (utt, count) in counts)
-
 println(proportions)
 
 all_utters = Dict((utter, 0.0) for utter in utterances)
-
 for (utter, prop) in proportions
     all_utters[utterances[utter]] = prop
 end
 
 utter_proportions = [all_utters[utter] for utter in utterances]
-
 bar(utterances, utter_proportions, xlabel="Utterances", ylabel="Proportions", legend=false)
