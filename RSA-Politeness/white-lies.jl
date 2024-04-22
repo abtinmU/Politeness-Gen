@@ -35,23 +35,6 @@ prob(utterance::String, state::Int64) = literalSemantics[utterance][state]
 
 end
 
-# The general distribution shae without observations (we expect uniform)
-#
-# traces =[Gen.simulate(literalListener, (stateProbs, "terrible")) for _=1:10000]
-# state_posterior = [trace[:state] for trace in traces]
-# 
-# counts = countmap(state_posterior)
-# 
-# total_samples = length(state_posterior)
-# proportions = Dict(state => count / total_samples for (state, count) in counts)
-# 
-# println(proportions)
-
-# states = collect(keys(proportions))  # Get the keys for the x-axis
-# state_proportions = collect(values(proportions))  # Get the values for the y-axis
-# 
-# bar(states, state_proportions, xlabel="States", ylabel="Proportions", legend=false)
-
 # Using importance sampling for inference over observations
 function L0_do_inference(model, stateProbs, utterance, m, amount_of_computation)
 
@@ -61,21 +44,6 @@ function L0_do_inference(model, stateProbs, utterance, m, amount_of_computation)
 
     return trace
 end;
-
-# traces = [L0_do_inference(literalListener, stateProbs, "good", true, 100) for _=1:1000]
-# state_posterior = [trace[:state] for trace in traces]
-# 
-# counts = countmap(state_posterior)
-# 
-# total_samples = length(state_posterior)
-# proportions = Dict(state => count / total_samples for (state, count) in counts)
-# 
-# println(proportions)
-#
-# states = collect(keys(proportions))  # Get the keys for the x-axis
-# state_proportions = collect(values(proportions))  # Get the values for the y-axis
-# 
-# bar(states, state_proportions, xlabel="States", ylabel="Proportions", legend=false)
 
 ####
 #### Part 2: Pragmatic Speaker
@@ -144,12 +112,6 @@ end
 
 end
 
-# traces =[Gen.simulate(speaker1, (4, 0.99)) for _=1:1000]
-# trace_pl = [trace[:utterance] for trace in traces]
-# counts = countmap(trace_pl)
-# proportions = Dict(state => count / 1000 for (state, count) in counts)
-# println(proportions)
-
 # Save the untility values of prgmatic speaker for easy access during the inference
 utils = Dict(state => (Dict(utterance => S1_utility(state, utterance, 0.99) for utterance in utterances)) for state in states)
 
@@ -165,24 +127,6 @@ utils = Dict(state => (Dict(utterance => S1_utility(state, utterance, 0.99) for 
     return trace
 
 end
-
-# traces =[S1_do_inference(speaker1, 1, 0.99, utils, 100) for _=1:10000]
-# trace_pl = [trace[:utterance] for trace in traces]
-# counts = countmap(trace_pl)
-# proportions = Dict(utt => count / 10000 for (utt, count) in counts)
-# println(proportions)
-#
-# all_utters = Dict((utter, 0.0) for utter in utterances)
-# 
-# for (utter, prop) in proportions
-#     if haskey(all_utters, utter)
-#         all_utters[utter] = prop
-#     end
-# end
-# 
-# utter_proportions = [all_utters[utter] for utter in utterances]
-# 
-# bar(utterances, utter_proportions, xlabel="Utterances", ylabel="Proportions", legend=false)
 
 ####
 #### Part 2: Pragmatic Listener
@@ -232,22 +176,6 @@ S1_posterior_mapped(state::Int64, phi::Float64) = S1_posterior_map[[state, phi]]
     return [state, phi]
 end
 
-# traces =[Gen.simulate(pragmaticListener, ("good", )) for _=1:1000000]
-# 
-# state_posterior1 = [trace[:state] for trace in traces]
-# state_posterior2 = [trace[:phi] for trace in traces]
-# 
-# counts1 = countmap(state_posterior1)
-# counts2 = countmap(state_posterior2)
-# 
-# total_samples1 = length(state_posterior1)
-# total_samples2 = length(state_posterior2)
-# 
-# proportions1 = Dict(state => count / total_samples1 for (state, count) in counts1)
-# proportions2 = Dict(state => count / total_samples2 for (state, count) in counts2)
-# 
-# println("state posterior: ", proportions1)
-# println("phi posterior: ", proportions2)
 
 function L1_do_inference(model, utterance, amount_of_computation)
 
