@@ -70,27 +70,6 @@ function L0_do_inference(model, stateProbs, utterance, m, amount_of_computation)
     return trace
 end;
 
-# traces = [L0_do_inference(literalListener, stateProbs, "not_amazing", true, 100) for _=1:10000]
-# state_posterior = [trace[:state] for trace in traces]
-# 
-# counts = countmap(state_posterior)
-# 
-# total_samples = length(state_posterior)
-# proportions = Dict(state => count / total_samples for (state, count) in counts)
-# 
-# println(proportions)
-# 
-# all_states = Dict((state, 0.0) for state in states)
-# 
-# for (state, prop) in proportions
-#     if haskey(all_states, state)
-#         all_states[state] = prop
-#     end
-# end
-# 
-# state_proportions = [all_states[state] for state in states]
-# 
-# bar(states, state_proportions, xlabel="States", ylabel="Proportions", legend=false)
 
 ####
 #### Part 2: Literal Listener
@@ -182,24 +161,6 @@ utils = Dict(state => (Dict(utterance => S1_utility(state, utterance, 0.99) for 
     return trace
 end
 
-# traces =[S1_do_inference3(speaker1, 1, 0.99, utils, 100) for _=1:10000]
-# 
-# trace_pl = [trace[:utterance] for trace in traces]
-# 
-# counts = countmap(trace_pl)
-# 
-# proportions = Dict(utt => count / 10000 for (utt, count) in counts)
-# 
-# println(proportions)
-# all_utters = Dict((utter, 0.0) for utter in utterances)
-# 
-# for (utter, prop) in proportions
-#     all_utters[utterances[utter]] = prop
-# end
-# 
-# utter_proportions = [all_utters[utter] for utter in utterances]
-# 
-# bar(utterances, utter_proportions, xlabel="Utterances", ylabel="Proportions", legend=false)
 
 ####
 #### Part 3: Literal Listener
@@ -258,38 +219,12 @@ function L1_do_inference(model, utterance, amount_of_computation)
     return trace
 end
 
-# traces =[L1_do_inference(pragmaticListener, "not_bad", 100) for _=1:100000]
-# 
-# state_posterior1 = [trace[:state] for trace in traces]
-# state_posterior2 = [trace[:phi] for trace in traces]
-# 
-# counts1 = countmap(state_posterior1)
-# counts2 = countmap(state_posterior2)
-# 
-# total_samples1 = length(state_posterior1)
-# total_samples2 = length(state_posterior2)
-# 
-# proportions1 = Dict(state => count / total_samples1 for (state, count) in counts1)
-# proportions2 = Dict(state => count / total_samples2 for (state, count) in counts2)
-# 
-# println("state posterior: ", proportions1)
-# println("phi posterior: ", proportions2)
-# 
-# states1 = collect(keys(proportions1))  # Get the keys for the x-axis
-# state_proportions1 = collect(values(proportions1))  # Get the values for the y-axis
-# 
-# bar(states1, state_proportions1, xlabel="States", ylabel="State Proportions", legend=false)
-# 
-# phi_num = collect(keys(proportions2))  # Get the keys for the x-axis
-# phi_proportions = collect(values(proportions2))  # Get the values for the y-axis
-# 
-# bar(phi_num, phi_proportions, xlabel="Phi Values", ylabel="Phi Proportions", legend=false)
 
 ####
 #### Part 4: Literal Listener
 ####
 
-# Again, I save the posterior of the previous model for easy (&fast) later access
+# Again, save the posterior of the previous model for easy (&fast) later access
 
 function L1_posterior(utter::Int64)
 
