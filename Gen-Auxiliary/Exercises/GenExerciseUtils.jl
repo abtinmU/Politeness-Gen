@@ -1,6 +1,6 @@
 module GenExerciseUtils
 
-# Many of these functions was taken from the Gen Tutorial. But a majority of them were modified by me to a better format.
+# These functions was taken directly from the Gen Tutorial. Some were modified by me to a better format.
 
 function render_trace(trace; show_data=true)
     
@@ -24,7 +24,6 @@ function render_trace(trace; show_data=true)
     return fig
 end;
 
-
 function do_inference(model, xs, ys, amount_of_computation)
     
     observations = Gen.choicemap()
@@ -35,7 +34,6 @@ function do_inference(model, xs, ys, amount_of_computation)
     (trace, _) = Gen.importance_resampling(model, (xs,), observations, amount_of_computation);
     return trace
 end;
-
 
 function overlay(renderer, traces; same_data=true, args...)
     fig = renderer(traces[1], show_data=true, args...)
@@ -53,8 +51,6 @@ function overlay(renderer, traces; same_data=true, args...)
     return fig
 end;
 
-
-
 function predict_new_data(model, trace, new_xs::Vector{Float64}, param_addrs)
   
     constraints = Gen.choicemap()
@@ -68,8 +64,6 @@ function predict_new_data(model, trace, new_xs::Vector{Float64}, param_addrs)
     return ys
 end;
 
-
-
 function infer_and_predict(model, xs, ys, new_xs, param_addrs, num_traces, amount_of_computation)
     pred_ys = []
     for i=1:num_traces
@@ -79,8 +73,6 @@ function infer_and_predict(model, xs, ys, new_xs, param_addrs, num_traces, amoun
     pred_ys
 end;
 
-
-
 function plot_predictions(xs, ys, new_xs, pred_ys; title="predictions")
     fig = scatter(xs, ys, color="red", label="observed data", title=title)
     for (i, pred_ys_single) in enumerate(pred_ys)
@@ -88,8 +80,6 @@ function plot_predictions(xs, ys, new_xs, pred_ys; title="predictions")
     end
     return fig
 end;
-
-
 
 struct Interval
     l::Float64
@@ -108,8 +98,6 @@ struct LeafNode <: Node
     interval::Interval
 end
 
-
-
 function render_node!(node::LeafNode)
     plot!([node.interval.l, node.interval.u], [node.value, node.value], label=nothing, linewidth=5)
 end
@@ -124,8 +112,6 @@ function render_segments_trace(trace; xlim=(0,1))
     render_node!(node)
     return fig
 end;
-
-
 
 @gen function regression_with_outliers(xs::Vector{<:Real})
 
@@ -150,8 +136,6 @@ end;
     ys
 end;
 
-
-
 function extract_data_from_trace(trace)
     xs, = get_args(trace)
     ys = get_retval(trace)
@@ -163,8 +147,6 @@ function extract_data_from_trace(trace)
     
     return xs, ys, is_outliers
 end
-
-
 
 function plot_trace_with_data(trace)
     plot(xlims=(-5, 5), ylims=(-20, 20))
@@ -184,11 +166,5 @@ function plot_trace_with_data(trace)
     
     plot!(xs, regression_line_y, color=:black, linestyle=:solid, legend=false)
 end
-
-
-
-
-
-
 
 end # module GenExerciseUtils
