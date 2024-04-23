@@ -1,2 +1,2 @@
 # Gen-Exercises
-My notes and sample solutions to Gen exercises from some sections of Gen tutorial
+My notes and sample solutions to some Gen exercises from Gen tutorial
