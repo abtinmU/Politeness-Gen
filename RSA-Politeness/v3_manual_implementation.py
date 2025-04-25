@@ -1,6 +1,8 @@
 """
 The RSA Model of Politeness Using Enumeration
 The case study of white lies
+
+Version 3: Manually implementing each step
 """
 
 ########################
@@ -14,16 +16,20 @@ Pkg.add("StatsBase")
 Pkg.add("StatsPlots")
 Pkg.add("Distributions")
 Pkg.add("StatsFuns")
-#Pkg.add("Luxor")
 
 #import Random, Logging
-using Gen, Plots, Distributions, StatsPlots, LinearAlgebra, StatsFuns
+using Gen, Plots, Distributions, StatsPlots, LinearAlgebra, StatsFuns, Printf
 using StatsBase: mean, countmap
+using Distributions: Categorical
+using StatsFuns: logsumexp
 
 
 ########################
 ### Literal Listener ###
 ########################
+
+using Gen
+using StatsFuns: logsumexp
 
 # Define state and utterance space
 states = [1, 2, 3, 4, 5]
@@ -48,11 +54,9 @@ stateProbs = uniformProbs(states)
 utterancesProbs = uniformProbs(utterances)
 
 @gen function literalListener(stateProbs::Vector{Float64}, utterance::String)
-
     state = @trace(uniformDraw(states, stateProbs), :state)
     m = @trace(meaning(utterance, state), :m)
     return state
-
 end
 
 """
@@ -111,26 +115,34 @@ function enum_inference(
     )
 end
 
+using Gen: logsumexp
+
 # Define observed actions
-# utterance = "good"  # The observed utterance
-# observations = choicemap((:m, 1))  # Observing that m is true
+utterance = "good"  # The observed utterance
+observations = choicemap((:m, 1))  # Observing that m is true
 
 # Run inference by enumerating over all possible states
-# results = enum_inference(
-#     literalListener,
-#     (utterancesProbs, utterance),
-#     observations,
-#     (:state, ),  # latent addresses
-#     (states, )
-# )
+results = enum_inference(
+    literalListener,
+    (utterancesProbs, utterance),
+    observations,
+    (:state, ),  # latent addresses
+    (states, )
+)
 
 # Print inferred state probabilities
-# println("Inferred state probabilities given that the utterance was `good` and m=true:")
-# for (state, prob) in zip(states, results.latent_probs[:state])
-#     println("State $state: Probability $prob")
-# end
+println("Inferred state probabilities given that the utterance was `good` and m=true:")
+for (state, prob) in zip(states, results.latent_probs[:state])
+    println("State $state: Probability $prob")
+end
 
-# bar(states, results.latent_probs[:state], xlabel="States", ylabel="Proportions", legend=false)
+bar(
+  states,
+  results.latent_probs[:state],
+  xlabel="States",
+  ylabel="Proportions",
+  legend=false
+  )
 
 
 ##########################
@@ -197,7 +209,6 @@ resulting_probs = speaker_log_probs(utterances, [0.2,0.2,0.2,0.2,0.2], S1_utilit
 println(resulting_probs)
 
 # Now we define the pragmtic speaker's model
-
 @gen function speaker1(state::Int64, phi::Float64)
 
     S1_probs = speaker_log_probs(utterances, [0.2,0.2,0.2,0.2,0.2], S1_utility, (state, phi, ))
@@ -207,24 +218,24 @@ println(resulting_probs)
 end
 
 # Define observed actions
-# observations = choicemap()  # We assume no observation for now
+observations = choicemap()  # no observations
 
-# # Run inference by enumerating over all possible states
-# results = enum_inference(
-#     speaker1,
-#     (1, 0.99),
-#     observations,
-#     (:utter, ),  # latent addresses
-#     (utterances, )
-# )
+# Run inference by enumerating over all possible states
+results = enum_inference(
+    speaker1,
+    (1, 0.99),
+    observations,
+    (:utter, ),  # latent addresses
+    (utterances, )
+)
 
 # Print inferred utterance probabilities
-# println("Inferred utterance probabilities given our observationns:")
-# for (utterance, prob) in zip(utterances, results.latent_probs[:utter])
-#     println("utterance $utterance: Probability $prob")
-# end
+println("Inferred utterance probabilities given our observationns:")
+for (utterance, prob) in zip(utterances, results.latent_probs[:utter])
+    println("utterance $utterance: Probability $prob")
+end
 
-# bar(utterances, results.latent_probs[:utter], xlabel="States", ylabel="Proportions", legend=false)
+bar(utterances, results.latent_probs[:utter], xlabel="States", ylabel="Proportions", legend=false)
 
 
 ##########################
@@ -232,7 +243,6 @@ end
 ##########################
 
 # Save S1's probabilities for different states and phis for fast later access
-
 utterProbsDict(state, phi, utterances) = Dict(utterance => prob for (utterance, prob) in zip(utterances, enum_inference(speaker1, (state, phi), observations, (:utter, ), (utterances, )).latent_probs[:utter]))
 phiVals = collect(0.05:0.05:0.95)
 phiProbs = uniformProbs(phiVals)
@@ -260,9 +270,9 @@ Calculate the posterior probabilities of states and φ (phi) values given an utt
 
 """
 
-function enumerate_L1(utterance::String, states::Vector{String}, stateProbs::Vector{Float64},
-                 phiVals::Vector{String}, phiProbs::Vector{Float64},
-                 S1_posterior_map::Dict{Tuple{String, String}, Dict{String, Float64}})
+function enumerate_L1(utterance::String, states::Vector{Int64}, stateProbs::Vector{Float64},
+                 phiVals::Vector{Float64}, phiProbs::Vector{Float64},
+                 S1_posterior_map::Dict{Tuple{Int64, Float64}, Dict{String, Float64}})
     # Initialize arrays to accumulate log probabilities, setting initial values to -Inf for log space addition
     state_log_probs = fill(-Inf, length(states))
     phi_log_probs = fill(-Inf, length(phiVals))
@@ -312,7 +322,7 @@ trace = Gen.simulate(pragmaticListener, ("good", ))
 Gen.get_choices(trace)
 
 # Define observed actions
-observations = choicemap()  # We assume no observation here
+observations = choicemap()  # no observations
 
 # Run inference by enumerating over all possible states
 results = enum_inference(
@@ -336,4 +346,4 @@ end
 
 bar(states, results.latent_probs[:state], xlabel="States", ylabel="Proportions", legend=false)
 
-bar(phiVals, L1_post, xlabel="Phis", ylabel="Proportions", legend=false)
+bar(phiVals, results.latent_probs[:phi], xlabel="Phis", ylabel="Proportions", legend=false)
