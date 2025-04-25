@@ -6,6 +6,6 @@ This repo contains an implementations of the politeness RSA model in Gen probail
 
 The implementation of this model was done in 3 alternative methods:
 
-- Using VE‐based inference by [GenVariableElimination.jl](https://github.com/probcomp/GenVariableElimination.jl).
+- Using VE‐based inference by [`GenVariableElimination.jl`](https://github.com/probcomp/GenVariableElimination.jl).
 - Using Gen's new [`enumerative_inference`](https://www.gen.dev/docs/dev/ref/inference/enumerative/) method.
 - Manual implementation of enumeration method.
