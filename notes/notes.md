@@ -121,7 +121,6 @@ Importance sampling can be difficult to scale to more complex problems, because 
 
 Long story short, all we do in a single Block Resimulation step is to apply metropolis hastings on our trace and update each prameters of our model.
 
-
 ~~~julia
 # This example, assumes we have a pre-defined bayesian linear model that in addition to a `slope` and `intercept`, also decides on whether or not a point is a outlier (along with some probability).
 

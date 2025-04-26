@@ -1,7 +1,9 @@
 module GenExerciseUtils
-
-# These functions was taken directly from the Gen Tutorial. Some were modified by me to a better format.
-
+"""
+ These functions were taken directly from the Gen Tutorial with small necessary modifications.
+ Source: https://www.gen.dev/tutorials/
+ 
+"""
 function render_trace(trace; show_data=true)
     
     xs, = get_args(trace)
