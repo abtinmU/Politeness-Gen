@@ -24,7 +24,7 @@ using Distributions: Categorical
 """
 Install Gen's Latest Repo Version
 The current Gen.jl stable release (v0.4.7) does not ship with `enumerative_inference` in its API. 
-We need to clone the latest Gen.jl repo and proceed with that version.
+We need to clone the latest Gen.jl repo and proceed with this version.
 """
 
 ; git clone https://github.com/probcomp/Gen.jl.git /content/Gen.jl
